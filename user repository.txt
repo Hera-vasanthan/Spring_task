@@ -1,0 +1,25 @@
+user repository:
+
+public interface UserRepository extends JpaRepository<User, Long> {
+    User findByUsername(String username);
+}
+
+user controller:
+
+@RestController
+@RequestMapping("/api")
+public class UserController {
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @GetMapping("/user/{username}")
+    public ResponseEntity<Long> getUserIdByUsername(@PathVariable String username) {
+        User user = userRepository.findByUsername(username);
+        if (user != null) {
+            return ResponseEntity.ok(user.getId());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+}
