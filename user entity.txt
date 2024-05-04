@@ -1,0 +1,348 @@
+user entity:
+package com.example.jobportal.model;
+
+import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
+
+@Entity
+@Table(name = "userdata")
+public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+
+    @Column(name = "User_Name")
+    private String username;
+
+    @Column(name = "Email_Id")
+    private String email;
+
+    @Column(name = "Mobile_Number")
+    private String mobile;
+
+    @Column(name = "Password")
+    private String password;
+
+    @ManyToMany
+    @JoinTable(
+        name = "user_jobs",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "job_id")
+    )
+    private Set<Jobs> appliedJobs = new HashSet<>();
+
+    // Constructors, getters, and setters
+
+    public Set<Jobs> getAppliedJobs() {
+        return this.appliedJobs;
+    }
+}
+
+
+user controller:
+package com.example.jobportal.controller;
+
+import java.util.Set;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import com.example.jobportal.model.Jobs;
+import com.example.jobportal.model.User;
+import com.example.jobportal.repository.UserRepository;
+
+@CrossOrigin(origins = "*")
+@RestController
+@RequestMapping("/api")
+public class UserController {
+    
+    @Autowired
+    private UserRepository userRepository;
+
+    // Other methods unchanged
+
+    @GetMapping("/appliedjobs/{userId}")
+    public ResponseEntity<Set<Jobs>> getAppliedJobsByUserId(@PathVariable Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+        
+        Set<Jobs> appliedJobs = user.getAppliedJobs();
+        return ResponseEntity.ok(appliedJobs);
+    }
+}
+
+
+job entity:
+package com.example.jobportal.model;
+
+import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
+
+@Entity
+@Table(name = "JobsData")
+public class Jobs {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+
+    @Column(name = "Job_Position")
+    private String position;
+
+    @Column(name = "Company_Name")
+    private String companyName;
+
+    @Column(name = "Job_Role")
+    private String role;
+
+    @Column(name = "Salary")
+    private String salary;
+
+    @Column(name = "Location")
+    private String location;
+
+    @Column(name = "Skills_Required")
+    private String skillsRequired;
+
+    @Column(name = "Job_Criteria")
+    private String criteria;
+
+    @ManyToMany(mappedBy = "appliedJobs")
+    private Set<User> applicants = new HashSet<>();
+
+    // Constructors, getters, and setters
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getPosition() {
+        return position;
+    }
+
+    public void setPosition(String position) {
+        this.position = position;
+    }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public String getSalary() {
+        return salary;
+    }
+
+    public void setSalary(String salary) {
+        this.salary = salary;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getSkillsRequired() {
+        return skillsRequired;
+    }
+
+    public void setSkillsRequired(String skillsRequired) {
+        this.skillsRequired = skillsRequired;
+    }
+
+    public String getCriteria() {
+        return criteria;
+    }
+
+    public void setCriteria(String criteria) {
+        this.criteria = criteria;
+    }
+
+    public Set<User> getApplicants() {
+        return applicants;
+    }
+
+    public void setApplicants(Set<User> applicants) {
+        this.applicants = applicants;
+    }
+}
+
+job controller:
+package com.example.jobportal.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import com.example.jobportal.model.Jobs;
+import com.example.jobportal.repository.JobsRepository;
+
+import java.util.Set;
+
+@CrossOrigin(origins = "*")
+@RestController
+@RequestMapping("/api")
+public class JobController {
+    
+    @Autowired
+    private JobsRepository jobsRepository;
+
+    @GetMapping("/jobs")
+    public List<Jobs> getAllJobs() {
+        return this.jobsRepository.findAll();
+    }
+
+    // Other methods unchanged
+
+    // No need for getAppliedJobsByUserId method here.
+}
+
+apiService:
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ApiService {
+
+  constructor(private httpClient: HttpClient) { }
+
+  postJob(data: any) {
+    return this.httpClient.post<any>("http://localhost:8080/api/job/", data);
+  }
+
+  getJob() {
+    return this.httpClient.get<any>("http://localhost:8080/api/jobs/");
+  }
+
+  getJobById(id: number) {
+    return this.httpClient.get<any>("http://localhost:8080/api/jobs/" + id);
+  }
+
+  putJob(data: any, id: number) {
+    return this.httpClient.put<any>("http://localhost:8080/api/updatejob/" + id, data);
+  }
+
+  deleteJob(id: any) {
+    return this.httpClient.delete<any>("http://localhost:8080/api/deletejob/" + id);
+  }
+
+  getAppliedJobsByUserId(userId: number) {
+    return this.httpClient.get<any>("http://localhost:8080/api/appliedjobs/" + userId);
+  }
+}
+
+
+jobs applied .ts:
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
+import { NgToastService } from 'ng-angular-popup';
+import { ApiService } from '../services/api.service';
+import { MatDialog } from '@angular/material/dialog';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
+
+@Component({
+  selector: 'app-jobsapplied',
+  templateUrl: './jobsapplied.component.html',
+  styleUrls: ['./jobsapplied.component.css']
+})
+export class JobsappliedComponent implements OnInit {
+
+  displayedColumns: string[] = ['position', 'companyname', 'role', 'salary', 'location', 'skillsrequired', 'criteria', 'actions'];
+  dataSource: MatTableDataSource<any>;
+
+  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatSort) sort: MatSort;
+
+  constructor(public dialog: MatDialog, private apiService: ApiService,
+    private router: Router, private toast: NgToastService, private route: ActivatedRoute) { }
+
+  userId: number; // Assuming you will get the userId from the route
+
+  ngOnInit(): void {
+    this.route.paramMap.subscribe(params => {
+      this.userId = +params.get('userId');
+      this.getAppliedJobs(this.userId);
+    });
+  }
+
+  getAppliedJobs(userId: number) {
+    this.apiService.getAppliedJobsByUserId(userId).subscribe(
+      data => {
+        this.dataSource = new MatTableDataSource(data);
+        this.dataSource.paginator = this.paginator;
+        this.dataSource.sort = this.sort;
+      },
+      error => {
+        this.toast.error({ detail: "Error!", summary: "Error While Fetching Data!!", duration: 5000 });
+      }
+    );
+  }
+
+  loadjob(row: any) {
+    console.log(row);
+  }
+
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
+  }
+}
+
+jobs applied html:
+
+<app-navbar2></app-navbar2>
+<div style="margin-top: 20px;">
+  <mat-form-field appearance="standard">
+    <mat-label>Filter</mat-label>
+    <input matInput (keyup)="applyFilter($event)" placeholder="search for anything..." #input>
+  </mat-form-field>
+  <div class="mat-elevation-z8" *ngIf="dataSource">
+    <table mat-table [dataSource]="dataSource" matSort>
+
+      <!-- Column definitions remain the same -->
+
+      <!-- Row shown when there is no matching data or when data is being fetched. -->
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell" colspan="8" *ngIf="!dataSource?.data || dataSource.data.length === 0">
+          No applied jobs found for this user.
+        </td>
+        <td class="mat-cell" colspan="8" *ngIf="dataSource?.data && dataSource.data.length > 0">
+          Loading...
+        </td>
+      </tr>
+    </table>
+
+    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page of users"></mat-paginator>
+  </div>
+</div>
+<router-outlet></router-outlet>
