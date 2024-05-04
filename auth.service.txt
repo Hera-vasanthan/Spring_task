@@ -1,0 +1,167 @@
+auth.service:
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthService {
+  private userId: number | null = null;
+
+  constructor(private httpClient: HttpClient) { }
+
+  setUserId(userId: number) {
+    this.userId = userId;
+  }
+
+  getUserId(): number | null {
+    return this.userId;
+  }
+
+  getUserIdByUsername(username: string) {
+    return this.httpClient.get<number>(`http://localhost:8080/api/user/${username}`);
+  }
+}
+
+
+login component.ts:
+import { Component, OnInit, ElementRef } from '@angular/core';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { NgToastService } from 'ng-angular-popup';
+import { HttpClient } from '@angular/common/http';
+import { AuthService } from '../services/auth.service'; // Import AuthService
+
+@Component({
+  selector: 'app-login',
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.css']
+})
+export class LoginComponent implements OnInit {
+
+  hide = true;
+  loginForm!: FormGroup;
+
+  constructor(
+    private elementRef: ElementRef,
+    private formBuilder: FormBuilder,
+    private httpClient: HttpClient,
+    private router: Router,
+    private toast: NgToastService,
+    private authService: AuthService // Inject AuthService
+  ) { }
+
+  ngOnInit(): void {
+    this.loginForm = this.formBuilder.group({
+      username: ['', Validators.required],
+      password: ['', Validators.required]
+    });
+  }
+
+  login() {
+    this.httpClient.post<any>('http://localhost:8080/api/login', {
+      username: this.loginForm.value.username,
+      password: this.loginForm.value.password
+    }).subscribe(res => {
+      if (res.success) {
+        // Authentication successful, fetch user ID
+        this.authService.getUserIdByUsername(this.loginForm.value.username).subscribe(userId => {
+          // Save user ID in AuthService
+          this.authService.setUserId(userId);
+          // Navigate to 'applyjobs' page
+          this.router.navigate(['applyjobs']);
+        }, error => {
+          // Handle error when fetching user ID
+          console.error('Error fetching user ID:', error);
+          // Display error message
+          this.toast.error({ detail: 'Error!', summary: 'Failed to fetch user ID', duration: 4000 });
+        });
+      } else {
+        // Authentication failed, display error message
+        this.toast.error({ detail: 'Error!', summary: 'Login Failed! User Not Found', duration: 4000 });
+      }
+    }, error => {
+      // Handle HTTP request error
+      this.toast.warning({ detail: 'Warning!', summary: 'Something Went Wrong!!', duration: 5000 });
+    });
+  }
+
+  ngAfterViewInit() {
+    this.elementRef.nativeElement.ownerDocument
+      .body.style.backgroundColor = 'lightblue';
+  }
+}
+
+
+jobs.applied.ts:
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
+import { NgToastService } from 'ng-angular-popup';
+import { ApiService } from '../services/api.service';
+import { MatDialog } from '@angular/material/dialog';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
+import { AuthService } from '../services/auth.service'; // Import AuthService
+
+@Component({
+  selector: 'app-jobsapplied',
+  templateUrl: './jobsapplied.component.html',
+  styleUrls: ['./jobsapplied.component.css']
+})
+export class JobsappliedComponent implements OnInit {
+
+  displayedColumns: string[] = ['position', 'companyname', 'role', 'salary', 'location', 'skillsrequired', 'criteria', 'actions'];
+  dataSource!: MatTableDataSource<any>;
+
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
+
+  constructor(
+    public dialog: MatDialog,
+    private apiService: ApiService,
+    private router: Router,
+    private toast: NgToastService,
+    private route: ActivatedRoute,
+    private authService: AuthService // Inject AuthService
+  ) { }
+
+  ngOnInit(): void {
+    // Get user ID from AuthService
+    const userId = this.authService.getUserId();
+    if (userId) {
+      // Call API to get applied jobs for the current user
+      this.getAppliedJobs(userId);
+    } else {
+      // User ID not available, handle error or redirect to login
+      console.error('User ID not available');
+      // Redirect to login page
+      this.router.navigate(['login']);
+    }
+  }
+
+  loadjob(row: any) {
+    console.log(row);
+  }
+
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
+  }
+
+  getAppliedJobs(userId: number) {
+    this.apiService.getAppliedJobsByUserId(userId).subscribe(data => {
+      this.dataSource = new MatTableDataSource(data);
+      this.dataSource.paginator = this.paginator;
+      this.dataSource.sort = this.sort;
+    }, error => {
+      console.error('Error fetching applied jobs:', error);
+      this.toast.error({ detail: 'Error!', summary: 'Failed to fetch applied jobs', duration: 4000 });
+    });
+  }
+}
+
