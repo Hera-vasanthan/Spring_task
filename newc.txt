@@ -1,0 +1,98 @@
+user entity:
+package com.example.jobportal.model;
+
+import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
+
+@Entity
+@Table(name = "userdata")
+public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+
+    @Column(name = "User_Name")
+    private String username;
+
+    @Column(name = "Email_Id")
+    private String email;
+
+    @Column(name = "Mobile_Number")
+    private String mobile;
+
+    @Column(name = "Password")
+    private String password;
+
+    @ManyToMany
+    @JoinTable(
+        name = "user_jobs",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "job_id")
+    )
+    private Set<Jobs> appliedJobs = new HashSet<>();
+
+    // Constructors, getters, and setters
+
+    public Set<Jobs> getAppliedJobs() {
+        return this.appliedJobs;
+    }
+
+    public void addAppliedJob(Jobs job) {
+        this.appliedJobs.add(job);
+    }
+
+    public void removeAppliedJob(Jobs job) {
+        this.appliedJobs.remove(job);
+    }
+}
+
+user controller:
+package com.example.jobportal.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import com.example.jobportal.model.Jobs;
+import com.example.jobportal.model.User;
+import com.example.jobportal.repository.UserRepository;
+
+import java.util.Optional;
+
+@CrossOrigin(origins = "*")
+@RestController
+@RequestMapping("/api")
+public class UserController {
+
+    @Autowired
+    private UserRepository userRepository;
+
+    // Other methods unchanged
+
+    @PostMapping("/applyjob")
+    public ResponseEntity<?> applyJobToUser(@RequestParam Long userId, @RequestParam Long jobId) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            // Fetch the job by its ID from the database
+            // Assuming you have a JobRepository for this
+            // Jobs job = jobRepository.findById(jobId).orElse(null);
+            // if (job != null) {
+            //     user.addAppliedJob(job);
+            //     userRepository.save(user);
+            //     return ResponseEntity.ok("Job applied successfully.");
+            // } else {
+            //     return ResponseEntity.notFound().build();
+            // }
+
+            // If you don't have a JobRepository, you can simply add the job ID to the user's applied jobs
+            user.addAppliedJob(new Jobs(jobId)); // Assuming Jobs constructor takes jobId
+            userRepository.save(user);
+            return ResponseEntity.ok("Job applied successfully.");
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+}
