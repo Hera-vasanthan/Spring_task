@@ -1,0 +1,79 @@
+package com.example.jobportal.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import com.example.jobportal.model.Jobs;
+import com.example.jobportal.model.User;
+import com.example.jobportal.repository.JobsRepository;
+import com.example.jobportal.repository.UserRepository;
+
+import java.util.Set;
+
+@CrossOrigin(origins = "*")
+@RestController
+@RequestMapping("/api")
+public class UserController {
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private JobsRepository jobsRepository;
+
+    // Other methods unchanged
+
+    // Method to apply for a job by a user
+    @PostMapping("/applyjob")
+    public ResponseEntity<?> applyForJob(@RequestParam Long userId, @RequestParam Long jobId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+
+        Jobs job = jobsRepository.findById(jobId)
+                .orElseThrow(() -> new ResourceNotFoundException("Job not found with id: " + jobId));
+
+        // Add the job to the user's applied jobs set
+        user.getAppliedJobs().add(job);
+        userRepository.save(user);
+
+        return new ResponseEntity<>("Job successfully applied by user", HttpStatus.OK);
+    }
+}
+
+api.service:
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ApiService {
+
+  constructor(private httpClient: HttpClient) { }
+
+  // Example method to apply for a job
+  applyForJob(jobId: number, userId: number): Observable<any> {
+    // Adjust the API endpoint and request body according to your backend implementation
+    return this.httpClient.post<any>(`http://localhost:8080/api/applyjob`, { jobId, userId });
+  }
+
+  // Other methods for CRUD operations on jobs, if needed
+}
+
+applyjob:
+applyJob(row: any) {
+  // Call your backend API to store the application data
+  this.apiService.applyForJob(row.id, this.userId).subscribe(
+    () => {
+      // Application successful, navigate to the applied jobs page
+      this.router.navigate(['appliedjobs']);
+    },
+    error => {
+      // Handle error
+      console.error('Error applying for job:', error);
+      this.toast.error({ detail: 'Error!', summary: 'Failed to apply for job', duration: 4000 });
+    }
+  );
+}
