@@ -1,0 +1,150 @@
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ApplyjobComponent } from './applyjob.component';
+import { ApiService } from '../services/api.service';
+import { NgToastService } from 'ng-angular-popup';
+import { of } from 'rxjs';
+
+describe('ApplyjobComponent', () => {
+  let component: ApplyjobComponent;
+  let fixture: ComponentFixture<ApplyjobComponent>;
+  let apiService: jasmine.SpyObj<ApiService>;
+
+  beforeEach(async () => {
+    const apiServiceSpy = jasmine.createSpyObj('ApiService', ['getJob']);
+
+    await TestBed.configureTestingModule({
+      declarations: [ApplyjobComponent],
+      providers: [
+        { provide: ApiService, useValue: apiServiceSpy },
+        NgToastService
+      ]
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(ApplyjobComponent);
+    component = fixture.componentInstance;
+    apiService = TestBed.inject(ApiService) as jasmine.SpyObj<ApiService>;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+
+  it('should fetch job data on ngOnInit', () => {
+    const mockData = [
+      { position: 'Software Developer', companyname: 'ABC Inc.', role: 'Developer', salary: '$60,000', location: 'New York', skillsrequired: 'Angular, JavaScript', criteria: 'Bachelor\'s Degree' }
+    ];
+    apiService.getJob.and.returnValue(of(mockData));
+    component.ngOnInit();
+    expect(apiService.getJob).toHaveBeenCalled();
+    expect(component.dataSource.data).toEqual(mockData);
+  });
+
+  it('should apply filter', () => {
+    const mockEvent = { target: { value: 'Developer' } };
+    component.dataSource = new MatTableDataSource([
+      { position: 'Software Developer', companyname: 'ABC Inc.', role: 'Developer', salary: '$60,000', location: 'New York', skillsrequired: 'Angular, JavaScript', criteria: 'Bachelor\'s Degree' },
+      { position: 'Product Manager', companyname: 'XYZ Corp.', role: 'Manager', salary: '$80,000', location: 'California', skillsrequired: 'Leadership, Communication', criteria: 'Master\'s Degree' }
+    ]);
+    component.applyFilter(mockEvent as any);
+    expect(component.dataSource.filteredData.length).toEqual(1);
+    expect(component.dataSource.filteredData[0].role).toEqual('Developer');
+  });
+
+  // Add more test cases as needed
+
+});
+
+
+
+
+
+dialog
+
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { DialogComponent } from './dialog.component';
+import { ReactiveFormsModule } from '@angular/forms';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { NgToastService } from 'ng-angular-popup';
+import { ApiService } from '../services/api.service';
+import { of } from 'rxjs';
+
+describe('DialogComponent', () => {
+  let component: DialogComponent;
+  let fixture: ComponentFixture<DialogComponent>;
+  let apiServiceSpy: jasmine.SpyObj<ApiService>;
+  let matDialogRefSpy: jasmine.SpyObj<MatDialogRef<DialogComponent>>;
+  let toastServiceSpy: jasmine.SpyObj<NgToastService>;
+
+  beforeEach(async () => {
+    const apiSpy = jasmine.createSpyObj('ApiService', ['postJob', 'putJob']);
+    const matDialogRefSpyObj = jasmine.createSpyObj('MatDialogRef', ['close']);
+    const toastSpy = jasmine.createSpyObj('NgToastService', ['success', 'error']);
+
+    await TestBed.configureTestingModule({
+      declarations: [DialogComponent],
+      imports: [ReactiveFormsModule],
+      providers: [
+        { provide: ApiService, useValue: apiSpy },
+        { provide: MatDialogRef, useValue: matDialogRefSpyObj },
+        { provide: MAT_DIALOG_DATA, useValue: {} },
+        { provide: NgToastService, useValue: toastSpy }
+      ]
+    }).compileComponents();
+  });
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(DialogComponent);
+    component = fixture.componentInstance;
+    apiServiceSpy = TestBed.inject(ApiService) as jasmine.SpyObj<ApiService>;
+    matDialogRefSpy = TestBed.inject(MatDialogRef) as jasmine.SpyObj<MatDialogRef<DialogComponent>>;
+    toastServiceSpy = TestBed.inject(NgToastService) as jasmine.SpyObj<NgToastService>;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+
+  it('should add job successfully', () => {
+    const mockJobData = { /* mock job data */ };
+    apiServiceSpy.postJob.and.returnValue(of({}));
+    component.jobForm.patchValue(mockJobData);
+    component.addJob();
+    expect(apiServiceSpy.postJob).toHaveBeenCalledWith(mockJobData);
+    expect(toastServiceSpy.success).toHaveBeenCalled();
+    expect(matDialogRefSpy.close).toHaveBeenCalledWith('save');
+  });
+
+  it('should handle error when adding job', () => {
+    const mockJobData = { /* mock job data */ };
+    const errorMessage = 'Error adding job';
+    apiServiceSpy.postJob.and.throwError(errorMessage);
+    component.jobForm.patchValue(mockJobData);
+    component.addJob();
+    expect(apiServiceSpy.postJob).toHaveBeenCalledWith(mockJobData);
+    expect(toastServiceSpy.error).toHaveBeenCalledWith({ detail: 'Error!', summary: 'Error While Adding The Job!!', duration: 4000 });
+  });
+
+  it('should update job successfully', () => {
+    const mockJobData = { /* mock job data */ };
+    apiServiceSpy.putJob.and.returnValue(of({}));
+    component.editData = mockJobData;
+    component.ngOnInit();
+    component.addJob();
+    expect(apiServiceSpy.putJob).toHaveBeenCalledWith(mockJobData, mockJobData.id);
+    expect(toastServiceSpy.success).toHaveBeenCalled();
+    expect(matDialogRefSpy.close).toHaveBeenCalledWith('update');
+  });
+
+  it('should handle error when updating job', () => {
+    const mockJobData = { /* mock job data */ };
+    const errorMessage = 'Error updating job';
+    apiServiceSpy.putJob.and.throwError(errorMessage);
+    component.editData = mockJobData;
+    component.ngOnInit();
+    component.addJob();
+    expect(apiServiceSpy.putJob).toHaveBeenCalledWith(mockJobData, mockJobData.id);
+    expect(toastServiceSpy.error).toHaveBeenCalledWith({ detail: 'Error!', summary: 'Error While Updating The Job!!', duration: 4000 });
+  });
+});
