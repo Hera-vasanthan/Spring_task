@@ -1,50 +1,82 @@
-import { TestBed, inject, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { SignupComponent } from './signup.component';
+import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { ApiService } from './api.service';
+import { RouterTestingModule } from '@angular/router/testing';
+import { NgToastService } from 'ng-angular-popup';
 
-describe('ApiService', () => {
-  let service: ApiService;
+describe('SignupComponent', () => {
+  let component: SignupComponent;
+  let fixture: ComponentFixture<SignupComponent>;
+  let toastService: NgToastService;
   let httpMock: HttpTestingController;
 
-  beforeEach(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [ApiService]
-    });
-    service = TestBed.inject(ApiService);
+      declarations: [SignupComponent],
+      imports: [ReactiveFormsModule, HttpClientTestingModule, RouterTestingModule],
+      providers: [NgToastService]
+    }).compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(SignupComponent);
+    component = fixture.componentInstance;
+    toastService = TestBed.inject(NgToastService);
     httpMock = TestBed.inject(HttpTestingController);
+    fixture.detectChanges();
   });
 
   afterEach(() => {
-    httpMock.verify(); // Verifies that no requests are outstanding.
+    httpMock.verify();
   });
 
-  it('should be created', () => {
-    expect(service).toBeTruthy();
+  it('should create', () => {
+    expect(component).toBeTruthy();
   });
 
-  it('should post job successfully', waitForAsync(() => {
-    const mockJobData = { /* mock job data */ };
-    service.postJob(mockJobData).subscribe(response => {
-      expect(response).toBeDefined();
-      // Add more expectations based on the response if needed
-    });
+  it('should initialize signupForm with required fields', () => {
+    expect(component.signupForm).toBeDefined();
+    expect(component.signupForm.controls['username']).toBeDefined();
+    expect(component.signupForm.controls['email']).toBeDefined();
+    expect(component.signupForm.controls['mobile']).toBeDefined();
+    expect(component.signupForm.controls['password']).toBeDefined();
+  });
 
-    const request = httpMock.expectOne('http://localhost:8080/api/job/');
-    expect(request.request.method).toBe('POST');
-    request.flush({ /* mock response data */ });
-  }));
+  it('should display error messages for invalid form fields', () => {
+    const usernameInput = component.signupForm.controls['username'];
+    usernameInput.setValue('');
+    expect(usernameInput.valid).toBeFalsy();
 
-  it('should get job successfully', waitForAsync(() => {
-    service.getJob().subscribe(response => {
-      expect(response).toBeDefined();
-      // Add more expectations based on the response if needed
-    });
+    const emailInput = component.signupForm.controls['email'];
+    emailInput.setValue('');
+    expect(emailInput.valid).toBeFalsy();
 
-    const request = httpMock.expectOne('http://localhost:8080/api/jobs/');
-    expect(request.request.method).toBe('GET');
-    request.flush({ /* mock response data */ });
-  }));
+    const mobileInput = component.signupForm.controls['mobile'];
+    mobileInput.setValue('');
+    expect(mobileInput.valid).toBeFalsy();
 
-  // Write similar tests for other methods (getJobById, putJob, deleteJob)
+    const passwordInput = component.signupForm.controls['password'];
+    passwordInput.setValue('');
+    expect(passwordInput.valid).toBeFalsy();
+
+    // Verify error messages
+    const compiled = fixture.nativeElement;
+    expect(compiled.querySelector('.mat-form-field:first-child mat-error').textContent).toContain('Username Is Required');
+    expect(compiled.querySelector('.mat-form-field:nth-child(2) mat-error').textContent).toContain('Email-Id Is Required');
+    expect(compiled.querySelector('.mat-form-field:nth-child(3) mat-error').textContent).toContain('Mobile Number Is Required');
+    expect(compiled.querySelector('.mat-form-field:nth-child(4) mat-error').textContent).toContain('Password Is Required');
+  });
+
+  it('should call signup service method on form submission', () => {
+    const spyToastSuccess = spyOn(toastService, 'success');
+    const mockUserData = { /* mock user data */ };
+    component.signupForm.patchValue(mockUserData);
+    component.signup();
+    const req = httpMock.expectOne('http://localhost:8080/api/user/');
+    expect(req.request.method).toBe('POST');
+    req.flush({ /* mock response data */ });
+    expect(spyToastSuccess).toHaveBeenCalled();
+    expect(component.signupForm.value).toEqual({username: '', email: '', mobile: '', password: ''}); // Form should be reset
+  });
 });
