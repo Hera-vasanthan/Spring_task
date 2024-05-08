@@ -1,47 +1,50 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { Navbar2Component } from './navbar2.component';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatButtonModule } from '@angular/material/button';
-import { RouterTestingModule } from '@angular/router/testing';
-import { NgToastService } from 'ng-angular-popup';
-import { Router } from '@angular/router';
+import { TestBed, inject, waitForAsync } from '@angular/core/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { ApiService } from './api.service';
 
-describe('Navbar2Component', () => {
-  let component: Navbar2Component;
-  let fixture: ComponentFixture<Navbar2Component>;
-  let router: Router;
-  let toastService: NgToastService;
-
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      declarations: [ Navbar2Component ],
-      imports: [ 
-        MatToolbarModule,
-        MatButtonModule,
-        RouterTestingModule
-      ],
-      providers: [
-        { provide: NgToastService, useValue: { success: jasmine.createSpy('success') } }
-      ]
-    })
-    .compileComponents();
-  }));
+describe('ApiService', () => {
+  let service: ApiService;
+  let httpMock: HttpTestingController;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(Navbar2Component);
-    component = fixture.componentInstance;
-    router = TestBed.inject(Router);
-    toastService = TestBed.inject(NgToastService);
-    fixture.detectChanges();
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [ApiService]
+    });
+    service = TestBed.inject(ApiService);
+    httpMock = TestBed.inject(HttpTestingController);
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  afterEach(() => {
+    httpMock.verify(); // Verifies that no requests are outstanding.
   });
 
-  it('should navigate to "/login" on logout', () => {
-    const navigateSpy = spyOn(router, 'navigate').and.stub();
-    component.logout();
-    expect(navigateSpy).toHaveBeenCalledWith(['login']);
+  it('should be created', () => {
+    expect(service).toBeTruthy();
   });
+
+  it('should post job successfully', waitForAsync(() => {
+    const mockJobData = { /* mock job data */ };
+    service.postJob(mockJobData).subscribe(response => {
+      expect(response).toBeDefined();
+      // Add more expectations based on the response if needed
+    });
+
+    const request = httpMock.expectOne('http://localhost:8080/api/job/');
+    expect(request.request.method).toBe('POST');
+    request.flush({ /* mock response data */ });
+  }));
+
+  it('should get job successfully', waitForAsync(() => {
+    service.getJob().subscribe(response => {
+      expect(response).toBeDefined();
+      // Add more expectations based on the response if needed
+    });
+
+    const request = httpMock.expectOne('http://localhost:8080/api/jobs/');
+    expect(request.request.method).toBe('GET');
+    request.flush({ /* mock response data */ });
+  }));
+
+  // Write similar tests for other methods (getJobById, putJob, deleteJob)
 });
