@@ -10,6 +10,7 @@ describe('Navbar2Component', () => {
   let component: Navbar2Component;
   let fixture: ComponentFixture<Navbar2Component>;
   let router: Router;
+  let toastService: NgToastService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -20,7 +21,7 @@ describe('Navbar2Component', () => {
         RouterTestingModule
       ],
       providers: [
-        { provide: NgToastService, useValue: {} }
+        { provide: NgToastService, useValue: { success: jasmine.createSpy('success') } }
       ]
     })
     .compileComponents();
@@ -30,6 +31,7 @@ describe('Navbar2Component', () => {
     fixture = TestBed.createComponent(Navbar2Component);
     component = fixture.componentInstance;
     router = TestBed.inject(Router);
+    toastService = TestBed.inject(NgToastService);
     fixture.detectChanges();
   });
 
