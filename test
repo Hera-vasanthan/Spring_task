@@ -180,3 +180,14 @@ it('should add job successfully', () => {
   // Expecting dialog to be closed with 'save' argument
   expect(matDialogRefSpy.close).toHaveBeenCalledWith('save');
 });
+ it('should fetch job data on ngOnInit', () => {
+    const mockData = [
+      { position: 'Software Developer', companyname: 'ABC Inc.', role: 'Developer', salary: '$60,000', location: 'New York', skillsrequired: 'Angular, JavaScript', criteria: 'Bachelor\'s Degree' }
+    ];
+    apiService.getJob.and.returnValue(of(mockData));
+
+    component.ngOnInit();
+
+    expect(apiService.getJob).toHaveBeenCalled();
+    expect(component.dataSource.data).toEqual(mockData);
+  });
