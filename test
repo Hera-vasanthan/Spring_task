@@ -148,3 +148,35 @@ describe('DialogComponent', () => {
     expect(toastServiceSpy.error).toHaveBeenCalledWith({ detail: 'Error!', summary: 'Error While Updating The Job!!', duration: 4000 });
   });
 });
+import { of } from 'rxjs';
+
+it('should add job successfully', () => {
+  // Mock job data
+  const mockJobData = {
+    position: 'Software Engineer',
+    companyname: 'ABC Inc.',
+    role: 'Developer',
+    salary: '$70,000',
+    location: 'New York',
+    skillsrequired: 'Angular, JavaScript',
+    criteria: 'Bachelor\'s Degree'
+  };
+
+  // Stubbing apiService.postJob() to return a successful response
+  apiServiceSpy.postJob.and.returnValue(of({}));
+
+  // Patching the job form with mock data
+  component.jobForm.patchValue(mockJobData);
+
+  // Calling the addJob method
+  component.addJob();
+
+  // Expecting that postJob was called with the mock job data
+  expect(apiServiceSpy.postJob).toHaveBeenCalledWith(mockJobData);
+
+  // Expecting success toast to be displayed
+  expect(toastServiceSpy.success).toHaveBeenCalled();
+
+  // Expecting dialog to be closed with 'save' argument
+  expect(matDialogRefSpy.close).toHaveBeenCalledWith('save');
+});
