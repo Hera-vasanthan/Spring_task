@@ -4,42 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Page</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <div class="image-container">
-            <img src="path_to_your_image.jpg" alt="Left Image" class="left-image">
-        </div>
-        <div class="card">
-            <form [formGroup]="loginForm" (ngSubmit)="login()">
-                <mat-card class="example-card">
-                    <h1 style="text-align: center;">Login Page</h1>
-                    <p> <br> Please Provide Login Credentials To Proceed!</p>
-                    <mat-form-field appearance="outline">
-                        <mat-label>User Name</mat-label>
-                        <input formControlName="username" matInput placeholder="Enter Username">
-                        <span style="color: red;" *ngIf="loginForm.controls['username'].dirty && loginForm.hasError('required','username')">Username Is Required</span>
-                        <mat-icon matSuffix>account_circle</mat-icon>
-                    </mat-form-field>
-                    <br>
-                    <mat-form-field appearance="outline">
-                        <mat-label>Password</mat-label>
-                        <input formControlName="password" placeholder="Enter Password" matInput [type]="hide ? 'password' : 'text'">
-                        <button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
-                            <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
-                        </button>
-                        <span style="color: red;" *ngIf="loginForm.controls['password'].dirty && loginForm.hasError('required','password')">Password Is Required</span>
-                    </mat-form-field>
-                    <section class="example-section">
-                        <mat-checkbox class="example-margin">Remember me!</mat-checkbox>
-                    </section>
-                    <br>
-                    <button type="submit" [disabled]="!loginForm.valid" mat-raised-button color="primary">Login</button>
-                    <br><br>
-                    New User? Click Here to <a routerLink="/signup" style="color: blue;"> Register</a>
-                </mat-card>
-            </form>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-6 offset-md-6 login-container">
+                <div class="card">
+                    <form [formGroup]="loginForm" (ngSubmit)="login()">
+                        <mat-card class="example-card">
+                            <h1 style="text-align: center;">Login Page</h1>
+                            <p> <br> Please Provide Login Credentials To Proceed!</p>
+                            <mat-form-field appearance="outline">
+                                <mat-label>User Name</mat-label>
+                                <input formControlName="username" matInput placeholder="Enter Username">
+                                <span style="color: red;" *ngIf="loginForm.controls['username'].dirty && loginForm.hasError('required','username')">Username Is Required</span>
+                                <mat-icon matSuffix>account_circle</mat-icon>
+                            </mat-form-field>
+                            <br>
+                            <mat-form-field appearance="outline">
+                                <mat-label>Password</mat-label>
+                                <input formControlName="password" placeholder="Enter Password" matInput [type]="hide ? 'password' : 'text'">
+                                <button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
+                                    <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+                                </button>
+                                <span style="color: red;" *ngIf="loginForm.controls['password'].dirty && loginForm.hasError('required','password')">Password Is Required</span>
+                            </mat-form-field>
+                            <section class="example-section">
+                                <mat-checkbox class="example-margin">Remember me!</mat-checkbox>
+                            </section>
+                            <br>
+                            <button type="submit" [disabled]="!loginForm.valid" mat-raised-button color="primary">Login</button>
+                            <br><br>
+                            New User? Click Here to <a routerLink="/signup" style="color: blue;"> Register</a>
+                        </mat-card>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </body>
@@ -47,29 +49,17 @@
 body {
     margin: 0;
     padding: 0;
-    font-family: Arial, sans-serif; /* Adjust font family as needed */
+    font-family: Arial, sans-serif;
+    background-color: #E6E6FA; /* Pleasant background color */
 }
 
-.container {
-    display: flex;
-    justify-content: flex-end; /* Align to the right */
-    align-items: center;
-    height: 100vh;
-    background-color: #FEF2F1; /* Single background color */
-}
-
-.image-container {
-    margin-left: auto; /* Push to the left */
-}
-
-.left-image {
-    max-width: 200px; /* Adjust image size as needed */
+.login-container {
+    background-color: transparent;
+    margin-top: 100px; /* Adjust margin as needed */
 }
 
 .card {
-    max-width: 500px;
-    padding: 60px;
-    background-color: white;
+    padding: 30px;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
