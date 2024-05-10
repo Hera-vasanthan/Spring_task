@@ -8,7 +8,9 @@
 </head>
 <body>
     <div class="container">
-        <img src="path_to_your_image.jpg" alt="Login Image" class="login-image">
+        <div class="image-container">
+            <img src="path_to_your_image.jpg" alt="Left Image" class="left-image">
+        </div>
         <div class="card">
             <form [formGroup]="loginForm" (ngSubmit)="login()">
                 <mat-card class="example-card">
@@ -43,37 +45,37 @@
 </body>
 </html>
 body {
-    background-color: #FEF2F1;
     margin: 0;
     padding: 0;
+    font-family: Arial, sans-serif; /* Adjust font family as needed */
 }
 
 .container {
     display: flex;
-    justify-content: center;
+    justify-content: flex-end; /* Align to the right */
     align-items: center;
     height: 100vh;
-    background-image: url('path_to_your_background_image.jpg');
-    background-size: cover;
+    background-color: #FEF2F1; /* Single background color */
+}
+
+.image-container {
+    margin-left: auto; /* Push to the left */
+}
+
+.left-image {
+    max-width: 200px; /* Adjust image size as needed */
 }
 
 .card {
     max-width: 500px;
     padding: 60px;
-    background-color: rgba(255, 255, 255, 0.8); /* Adjust opacity as needed */
+    background-color: white;
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add shadow for depth */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .example-card {
     position: relative;
-}
-
-.login-image {
-    position: absolute;
-    top: 0;
-    left: -100px; /* Adjust as needed */
-    max-width: 200px; /* Adjust size as needed */
 }
 
 p {
