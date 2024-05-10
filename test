@@ -1,57 +1,73 @@
-Login html:<div class="container">
-    <app-navbar></app-navbar>
-    <div class="card">
-        <form [formGroup]="loginForm" (ngSubmit)="login()">
-            <mat-card class="example-card">
-                <h1 style="text-align: center;">Welcome Back!</h1>
-                <p style="text-align: center;">Please provide your login credentials to proceed.</p>
-                <img src="path_to_your_image" alt="Job Portal Logo" class="logo">
-                <mat-form-field appearance="outline">
-                    <mat-label>User Name</mat-label>
-                    <input formControlName="username" matInput placeholder="Enter Username">
-                    <span class="error-message" *ngIf="loginForm.controls['username'].dirty && loginForm.hasError('required','username')">Username is required</span>
-                    <mat-icon matSuffix>account_circle</mat-icon>
-                </mat-form-field>
-                <br>
-                <mat-form-field appearance="outline">
-                    <mat-label>Password</mat-label>
-                    <input formControlName="password" placeholder="Enter Password" matInput [type]="hide ? 'password' : 'text'">
-                    <button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
-                      <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
-                    </button>
-                    <span class="error-message" *ngIf="loginForm.controls['password'].dirty && loginForm.hasError('required','password')">Password is required</span>
-                </mat-form-field>
-                <section class="remember-me">
-                    <mat-checkbox class="example-margin">Remember me</mat-checkbox>
-                </section>
-                <br>
-                <button type="submit" [disabled]="!loginForm.valid" mat-raised-button color="primary">Login</button>
-                <br>
-                <p style="text-align: center;">New User? Click <a routerLink="/signup" style="color: blue;">here</a> to register</p>
-            </mat-card>
-        </form>
+<div class="container">
+    <div class="left-side">
+        <!-- Job portal photo or background -->
+        <img src="job_portal_photo.jpg" alt="Job Portal Photo">
+    </div>
+    <div class="right-side">
+        <!-- Login box -->
+        <app-navbar></app-navbar>
+        <div class="card">
+            <form [formGroup]="loginForm" (ngSubmit)="login()">
+                <mat-card class="example-card">
+                    <h1 style="text-align: center;">Welcome Back!</h1>
+                    <p style="text-align: center;">Please provide your login credentials to proceed.</p>
+                    <img src="path_to_your_image" alt="Job Portal Logo" class="logo">
+                    <mat-form-field appearance="outline">
+                        <mat-label>User Name</mat-label>
+                        <input formControlName="username" matInput placeholder="Enter Username">
+                        <span class="error-message" *ngIf="loginForm.controls['username'].dirty && loginForm.hasError('required','username')">Username is required</span>
+                        <mat-icon matSuffix>account_circle</mat-icon>
+                    </mat-form-field>
+                    <br>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Password</mat-label>
+                        <input formControlName="password" placeholder="Enter Password" matInput [type]="hide ? 'password' : 'text'">
+                        <button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
+                            <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+                        </button>
+                        <span class="error-message" *ngIf="loginForm.controls['password'].dirty && loginForm.hasError('required','password')">Password is required</span>
+                    </mat-form-field>
+                    <section class="remember-me">
+                        <mat-checkbox class="example-margin">Remember me</mat-checkbox>
+                    </section>
+                    <br>
+                    <button type="submit" [disabled]="!loginForm.valid" mat-raised-button color="primary">Login</button>
+                    <br>
+                    <p style="text-align: center;">New User? Click <a routerLink="/signup" style="color: blue;">here</a> to register</p>
+                </mat-card>
+            </form>
+        </div>
     </div>
 </div>
-
-login css:
 body {
-    background-color: #f0f0f0;
     margin: 0;
     padding: 0;
     font-family: Arial, sans-serif;
 }
 
 .container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    height: 100vh;
+}
+
+.left-side {
+    background-image: url("job_portal_photo.jpg");
+    background-size: cover;
+    background-position: center;
+}
+
+.right-side {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    padding: 20px;
 }
 
 .card {
     max-width: 400px;
     width: 100%;
-    padding: 20px;
     border-radius: 10px;
     background-color: #ffffff;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
