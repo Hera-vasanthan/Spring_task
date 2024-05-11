@@ -3,11 +3,34 @@
         <button mat-icon-button class="example-icon" aria-label="Example icon-button with menu icon">
             <mat-icon>group</mat-icon>
         </button>
-        <span>Online Job Portal</span>
+        <span class="navbar-title">Online Job Portal</span>
         <span class="example-spacer"></span>
+        <button mat-button class="navbar-button">Sign Up</button>
+        <button mat-button class="navbar-button">Login</button>
     </mat-toolbar>
 </div>
 .custom-toolbar {
-    background: linear-gradient(135deg, #00CED1, #20B2AA); /* Gradient background */
+    background: linear-gradient(135deg, #2e7d32, #004d40); /* Darker gradient background */
     color: #fff; /* Text color */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Add shadow */
+}
+
+.navbar-title {
+    font-family: 'Arial', sans-serif; /* Change font */
+    font-size: 20px; /* Adjust font size */
+    margin-left: 10px; /* Add spacing */
+}
+
+.navbar-button {
+    color: #fff; /* Text color */
+    background-color: #00acc1; /* Button background color */
+    border: none; /* Remove border */
+    border-radius: 20px; /* Round border */
+    margin-left: 10px; /* Add spacing */
+    padding: 5px 20px; /* Add padding */
+    transition: background-color 0.3s, color 0.3s; /* Smooth transition */
+}
+
+.navbar-button:hover {
+    background-color: #007c91; /* Darker button background color on hover */
 }
