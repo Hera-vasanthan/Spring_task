@@ -1,8 +1,10 @@
 .card {
     padding: 30px;
     border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
-    background-color: #fff; /* Set background color to white */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    max-width: 400px; /* Limit card width */
+    margin: 0 auto; /* Center the card horizontally */
 }
 
 .example-card {
@@ -10,16 +12,20 @@
 }
 
 h1 {
-    color: #333; /* Darken the heading text color */
+    color: #333;
+    font-size: 24px;
+    margin-bottom: 20px; /* Add spacing below the heading */
 }
 
 p {
-    color: #666; /* Change paragraph text color */
-    font-size: 16px; /* Increase font size */
+    color: #666;
+    font-size: 16px;
+    margin-bottom: 20px; /* Add spacing below the paragraph */
 }
 
 .mat-form-field {
     width: 100%;
+    margin-bottom: 20px; /* Add spacing between form fields */
 }
 
 button[type="submit"] {
@@ -27,10 +33,10 @@ button[type="submit"] {
 }
 
 a {
-    color: #007bff; /* Change link text color */
-    text-decoration: none; /* Remove underline from links */
+    color: #007bff;
+    text-decoration: none;
 }
 
 a:hover {
-    text-decoration: underline; /* Underline links on hover */
+    text-decoration: underline;
 }
