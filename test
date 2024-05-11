@@ -1,11 +1,14 @@
-@import '~@angular/material/theming';
+button[type="submit"] {
+    width: 100%;
+    background-color: #20B2AA; /* Match button color with gradient */
+    color: #fff; /* Text color for the button */
+    border: none; /* Remove border */
+    padding: 10px 20px; /* Add padding */
+    border-radius: 5px; /* Add border radius */
+    cursor: pointer; /* Add cursor pointer */
+    transition: background-color 0.3s; /* Smooth transition */
+}
 
-// Define your custom theme
-$custom-theme: mat.define-light-theme((
-  color: (
-    primary: #20B2AA, // Match button color with gradient
-  )
-));
-
-// Include your custom theme
-@include mat.all-component-themes($custom-theme);
+button[type="submit"]:hover {
+    background-color: #008B8B; /* Darker shade on hover */
+}
