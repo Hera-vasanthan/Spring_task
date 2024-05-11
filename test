@@ -1,98 +1,11 @@
-<div class="container">
-    <app-navbar></app-navbar>
-    <div class="card">
-        <form [formGroup]="signupForm">
-            <mat-card class="example-card">
-                <h1 style="text-align: center;">Signup Page</h1>
-                <p style="color: blue; text-align: center;">Enter all the required fields to register with us</p>
-                <mat-form-field appearance="outline">
-                    <mat-label>User Name</mat-label>
-                    <input formControlName="username" matInput placeholder="Enter Username">
-                    <span style="color: red;" *ngIf="signupForm.controls['username'].dirty && signupForm.hasError('required','username')">Username Is Required</span>
-                    <mat-icon matSuffix>account_circle</mat-icon>
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                    <mat-label>Email</mat-label>
-                    <input formControlName="email" matInput placeholder="Enter Email-Id">
-                    <span style="color: red;" *ngIf="signupForm.controls['email'].dirty && signupForm.hasError('required','email')">Email-Id Is Required</span>
-                    <mat-icon matSuffix>email</mat-icon>
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                    <mat-label>Mobile Number</mat-label>
-                    <input formControlName="mobile" matInput placeholder="Enter Mobile Number">
-                    <span style="color: red;" *ngIf="signupForm.controls['mobile'].dirty && signupForm.hasError('required','mobile')">Mobile Number Is Required</span>
-                    <mat-icon matSuffix>phone</mat-icon>
-                </mat-form-field>
-                <br>
-                <mat-form-field appearance="outline">
-                    <mat-label>Password</mat-label>
-                    <input formControlName="password" placeholder="Enter Password" matInput [type]="hide ? 'password' : 'text'">
-                    <span style="color: red;" *ngIf="signupForm.controls['password'].dirty && signupForm.hasError('required','password')">Password Is Required</span>
-                    <button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
-                        <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
-                    </button>
-                </mat-form-field>
-                <button mat-raised-button color="primary"  [disabled]="!signupForm.valid" (click)="signup()">Signup</button> 
-                <br>
-                <br>
-                Already a user? Click Here to <a routerLink="/login" style="color: blue;"> Login</a>
-            </mat-card>
-        </form>
-    </div>
-</div>
-body {
-    background-color: #FEF2F1;
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
-}
+@import '~@angular/material/theming';
 
-.container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-}
+// Define your custom theme
+$custom-theme: mat.define-light-theme((
+  color: (
+    primary: #20B2AA, // Match button color with gradient
+  )
+));
 
-.card {
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    background-color: #fff;
-    max-width: 400px; /* Limit card width */
-    margin: 0 auto; /* Center the card horizontally */
-}
-
-.example-card {
-    position: relative;
-}
-
-h1 {
-    color: #333;
-    font-size: 24px;
-    margin-bottom: 20px; /* Add spacing below the heading */
-}
-
-p {
-    color: #666;
-    font-size: 16px;
-    margin-bottom: 20px; /* Add spacing below the paragraph */
-}
-
-.mat-form-field {
-    width: 100%;
-    margin-bottom: 20px; /* Add spacing between form fields */
-}
-
-button[type="submit"] {
-    width: 100%;
-}
-
-a {
-    color: #007bff;
-    text-decoration: none;
-}
-
-a:hover {
-    text-decoration: underline;
-}
+// Include your custom theme
+@include mat.all-component-themes($custom-theme);
